@@ -258,7 +258,7 @@ div.sphinxsidebar input[type=text]{
 
 a {
     color: #330033;
-    text-decoration: none;
+    text-decoration: underline;
 }
 
 a:hover {
@@ -404,4 +404,9 @@ div.viewcode-block:target {
     background-color: #f4debf;
     border-top: 1px solid #ac9;
     border-bottom: 1px solid #ac9;
+}
+
+h2 a {
+    color: #FFFFFF;
+    text-decoration: underline;
 }
