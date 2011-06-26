@@ -25,7 +25,7 @@ What you're not supposed to do with MNE Python
     - **Process raw files**: In short everything you do with *mne_process_raw* (filtering, computing SSP vectors, downsampling etc.)
     - **Forward modeling**: BEM computation and mesh creation (done with FreeSurfer)
     - **Raw data visualization** done with *mne_browse_raw*
-    - **MNE source estimates visualization** done *mne_analyze*
+    - **MNE source estimates visualization** done with *mne_analyze*
 
 What you can do with MNE Python
 ----------------------------------------------
@@ -34,7 +34,8 @@ What you can do with MNE Python
     - **Averaging** to get Evoked data
     - **Linear inverse solvers** (dSPM, MNE)
     - **Time-frequency** analysis with Morlet wavelets (induced power, phase lock value) also in the source space
-    - **Non-parametric statistics** in time, space and frequency
+    - **Compute contrasts** between conditions, between sensors, across subjects etc.
+    - **Non-parametric statistics** in time, space and frequency (including with cluster-level)
     - **Scripting** (batch and parallel computing)
 
 .. note:: Packaged based on the FIF file format from Neuromag but can work with CTF and 4D after conversion to FIF.
@@ -103,14 +104,15 @@ Read data from file:
 
 Read and plot a segment of raw data
 
-    >>> start, stop = raw.time_to_index(100, 115) # 100 s to 115 s data segment
+    >>> start, stop = raw.time_to_index(100, 115)  # 100 s to 115 s data segment
     >>> data, times = raw[:, start:stop]
-    Reading 15015 ... 17266  =     99.998 ...   114.989 secs...  [done]
+    Reading 21465 ... 23716  =    142.953 ...   157.945 secs...  [done]
     >>> print data.shape
     (376, 2252)
     >>> print times.shape
     (2252,)
-    >>> data, times = raw[2:20:3, start:stop] # take some Magnetometers
+    >>> data, times = raw[2:20:3, start:stop]  # take some Magnetometers
+    Reading 21465 ... 23716  =    142.953 ...   157.945 secs...  [done]
 
 .. figure:: images/plot_read_raw_data.png
     :alt: Raw data
@@ -118,7 +120,8 @@ Read and plot a segment of raw data
 Save a segment of 150s of raw data (MEG only):
 
     >>> picks = mne.fiff.pick_types(raw.info, meg=True, eeg=False, stim=True)
-    >>> raw.save('sample_audvis_meg_raw.fif', tmin=0, tmax=150, picks=picks)
+    >>> raw.save('sample_audvis_meg_raw.fif', tmin=0, tmax=150, picks=picks) # doctest: +ELLIPSIS
+    Reading ...
 
 Define and read epochs
 ----------------------
@@ -148,22 +151,29 @@ Pick the good channels:
 
     >>> picks = mne.fiff.pick_types(raw.info, meg=True, eeg=True, eog=True, stim=False, exclude=exclude)
 
+Define the baseline period:
+
+    >>> baseline = (None, 0)  # means from the first instant to t = 0
+
+Define peak-to-peak rejection parameters for gradiometers, magnetometers and EOG:
+
+    >>> reject = dict(grad=4000e-13, mag=4e-12, eog=150e-6)
+
 Read epochs:
 
-    >>> epochs = mne.Epochs(raw, events, event_id, tmin, tmax, proj=True, picks=picks, baseline=(None, 0),
-                            preload=False, reject=dict(grad=4000e-13, mag=4e-12, eog=150e-6))
+    >>> epochs = mne.Epochs(raw, events, event_id, tmin, tmax, proj=True, picks=picks, baseline=baseline, preload=False, reject=reject)
     4 projection items activated
-    The projection vectors do not apply to these channels
+    Created an SSP operator (subspace dimension = 4)
     72 matching events found
     >>> print epochs
-    Epochs (n_epochs : 72, tmin : -0.2 (s), tmax : 0.5 (s), baseline : (None, 0))
+    Epochs (n_events : 72, tmin : -0.2 (s), tmax : 0.5 (s), baseline : (None, 0))
 
 Compute evoked responses by averaging and plot it:
 
     >>> evoked = epochs.average() # doctest: +ELLIPSIS
     Reading ...
     >>> print evoked
-    Evoked (comment : Evoked data, time : [-0.199795, 0.492828], n_epochs : 72, n_channels x n_times : 364 x 105)
+    Evoked (comment : Unknown, time : [-0.199795, 0.492828], n_epochs : 72, n_channels x n_times : 364 x 105)
     >>> from mne.viz import plot_evoked
     >>> plot_evoked(evoked)
 
@@ -177,7 +187,26 @@ Compute evoked responses by averaging and plot it:
   >>> max_in_each_epoch = [e.max() for e in epochs] # doctest:+ELLIPSIS
   Reading ...
   >>> print max_in_each_epoch[:4]
-  [2.6751692973693302e-05, 3.5135456261958446e-05, 2.0282791755715339e-05, 2.2940160602805886e-05]
+  [1.9375166986930204e-05, 1.6405511048086112e-05, 1.8545375480692806e-05, 2.041281478349248e-05]
+
+Time-Frequency: Induced power and phase-locking values
+======================================================
+
+Define parameters:
+
+    >>> import numpy as np
+    >>> n_cycles = 2  # number of cycles in Morlet wavelet
+    >>> frequencies = np.arange(7, 30, 3)  # frequencies of interest
+    >>> Fs = raw.info['sfreq']  # sampling in Hz
+
+Compute induced power and phase-locking values:
+
+    >>> data = epochs.get_data()
+    >>> from mne.time_frequency import induced_power
+    >>> power, phase_lock = induced_power(data, Fs=Fs, frequencies=frequencies, n_cycles=2, n_jobs=1)
+
+.. figure:: images/time_freq_demo.png
+    :alt: Time-Frequency
 
 Inverse modeling: MNE and dSPM on evoked and raw data
 =====================================================
@@ -189,7 +218,8 @@ Import the required functions:
 Read the inverse operator:
 
     >>> fname_inv = data_path + '/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif'
-    >>> inverse_operator = read_inverse_operator(fname_inv)
+    >>> inverse_operator = read_inverse_operator(fname_inv) # doctest: +ELLIPSIS
+    Reading ...
 
 Define the inverse parameters:
 
@@ -199,11 +229,13 @@ Define the inverse parameters:
 
 Compute the inverse solution:
 
-    >>> stc = apply_inverse(evoked, inverse_operator, lambda2, dSPM)
+    >>> stc = apply_inverse(evoked, inverse_operator, lambda2, dSPM) # doctest:+ELLIPSIS
+    Preparing the inverse operator for use ...
 
 Save the source time courses to disk:
 
     >>> stc.save('mne_dSPM_inverse')
+    Writing STC to disk... [done]
 
 Now, let's compute dSPM on a raw file within a label:
 
@@ -212,12 +244,15 @@ Now, let's compute dSPM on a raw file within a label:
 
 Compute inverse solution during the first 15s:
 
+    >>> from mne.minimum_norm import apply_inverse_raw
     >>> start, stop = raw.time_to_index(0, 15)  # read the first 15s of data
-    >>> stc = apply_inverse_raw(raw, inverse_operator, lambda2, dSPM, label, start, stop)
+    >>> stc = apply_inverse_raw(raw, inverse_operator, lambda2, dSPM, label, start, stop) # doctest:+ELLIPSIS
+    Preparing the inverse operator for use ...
 
 Save result in stc files:
 
     >>> stc.save('mne_dSPM_raw_inverse_Aud')
+    Writing STC to disk... [done]
 
 What else can I do?
 ===================
@@ -232,6 +267,7 @@ What comes next?
 ================
 
     - sparse solvers
+    - beamformers (e.g. LCMV)
     - coherence measures
     - anything you want to contribute for the community !
 
@@ -242,11 +278,6 @@ Some screen shots
     :alt: 2D toprography
 
     2D toprography
-
-.. figure:: images/plot_time_frequency.png
-    :alt: Time Frequency
-
-    Time frequency decomposition of one sensor
 
 .. figure:: images/plot_cluster_1samp_test_time_frequency.png
     :alt: Cluster level stat in time Frequency decomposition
@@ -264,8 +295,9 @@ Some screen shots
     Statistics on evoked data
 
 
-Want to know more ? Go to `martinos.org/mne`_
-=================================================
+Want to know more ? Go to `martinos.org/mne`_ and browse `examples`_ gallery
+============================================================================
 
 .. _martinos.org/mne: http://www.martinos.org/mne
+.. _examples: https://martinos.org/mne/auto_examples/index.html
 
