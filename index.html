@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Intro to MEG and EEG processing with MNE and Python &mdash; M/EEG data analysis with MNE and Python</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2011',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="M/EEG data analysis with MNE and Python" href="#" /> 
+  </head>
+  <body>
+    <div class="header-wrapper">
+      <div class="header">
+          <p class="logo"><a href="#">
+            <img src="_static/logo.png" alt="Logo"/>
+          </a>
+          </p><div class="navbar">
+
+
+
+
+</div>
+
+          </div> <!-- end navbar --></div>
+    </div>
+
+    <div class="content-wrapper">
+
+    <!-- <div class="sphinxsidebar">
+
+    <div class="rel">
+    </div>
+
+    <h3>Contents</h3>
+        <ul>
+<li><a class="reference internal" href="#">Intro to MEG and EEG processing with MNE and Python</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#mne-python-the-project-vision">MNE Python: The project vision</a></li>
+<li><a class="reference internal" href="#what-you-re-not-supposed-to-do-with-mne-python">What you&#8217;re not supposed to do with MNE Python</a></li>
+<li><a class="reference internal" href="#what-you-can-do-with-mne-python">What you can do with MNE Python</a></li>
+<li><a class="reference internal" href="#why-python">Why Python?</a></li>
+<li><a class="reference internal" href="#installation-of-the-required-materials">Installation of the required materials</a><ul>
+<li><a class="reference internal" href="#get-the-code">Get the code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#from-raw-data-to-evoked-data">From raw data to evoked data</a><ul>
+<li><a class="reference internal" href="#access-raw-data">Access raw data</a></li>
+<li><a class="reference internal" href="#define-and-read-epochs">Define and read epochs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#time-frequency-induced-power-and-phase-locking-values">Time-Frequency: Induced power and phase-locking values</a></li>
+<li><a class="reference internal" href="#inverse-modeling-mne-and-dspm-on-evoked-and-raw-data">Inverse modeling: MNE and dSPM on evoked and raw data</a></li>
+<li><a class="reference internal" href="#what-else-can-you-do">What else can you do?</a></li>
+<li><a class="reference internal" href="#what-comes-next">What comes next?</a></li>
+<li><a class="reference internal" href="#some-screen-shots">Some screen shots</a></li>
+<li><a class="reference internal" href="#want-to-know-more-go-to-martinos-org-mne-and-browse-examples-gallery">Want to know more ? Go to martinos.org/mne and browse examples gallery</a></li>
+</ul>
+</li>
+</ul>
+
+
+    </div> -->
+
+    <div class="content">
+        
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="intro-to-meg-and-eeg-processing-with-mne-and-python">
+<h1>Intro to MEG and EEG processing with MNE and Python<a class="headerlink" href="#intro-to-meg-and-eeg-processing-with-mne-and-python" title="Permalink to this headline">¶</a></h1>
+<p><strong>Authors:</strong> A. Gramfort and M. Hämäläinen</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="mne-python-the-project-vision">
+<h3>MNE Python: The project vision<a class="headerlink" href="#mne-python-the-project-vision" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><strong>Make your life easier</strong> when interacting <strong>with MEG/EEG data</strong></li>
+<li><strong>Open</strong> project: very permissive BSD license, open version control system to facilitate contributions</li>
+<li>The project should be maintained by a <strong>community of labs</strong></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="what-you-re-not-supposed-to-do-with-mne-python">
+<h3>What you&#8217;re not supposed to do with MNE Python<a class="headerlink" href="#what-you-re-not-supposed-to-do-with-mne-python" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><strong>Process raw files</strong>: In short everything you do with <em>mne_process_raw</em> (filtering, computing SSP vectors, downsampling etc.)</li>
+<li><strong>Forward modeling</strong>: BEM computation and mesh creation (done with FreeSurfer)</li>
+<li><strong>Raw data visualization</strong> done with <em>mne_browse_raw</em></li>
+<li><strong>MNE source estimates visualization</strong> done with <em>mne_analyze</em></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="what-you-can-do-with-mne-python">
+<h3>What you can do with MNE Python<a class="headerlink" href="#what-you-can-do-with-mne-python" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><strong>Epoching</strong>: Define epochs, baseline correction etc.</li>
+<li><strong>Averaging</strong> to get Evoked data</li>
+<li><strong>Linear inverse solvers</strong> (dSPM, MNE)</li>
+<li><strong>Time-frequency</strong> analysis with Morlet wavelets (induced power, phase lock value) also in the source space</li>
+<li><strong>Compute contrasts</strong> between conditions, between sensors, across subjects etc.</li>
+<li><strong>Non-parametric statistics</strong> in time, space and frequency (including with cluster-level)</li>
+<li><strong>Scripting</strong> (batch and parallel computing)</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Packaged based on the FIF file format from Neuromag but can work with CTF and 4D after conversion to FIF.</p>
+</div>
+</div>
+<div class="section" id="why-python">
+<h3>Why Python?<a class="headerlink" href="#why-python" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><ul class="simple">
+<li>Python is a real language that allows to design <strong>clean and powerful APIs</strong> (e.g. can be object oriented)</li>
+<li>Runs on <strong>all systems</strong> (Linux, Mac and Windows)</li>
+<li><strong>Free</strong></li>
+<li>Full <strong>control of the memory</strong> you use for your analysis</li>
+<li><strong>Packaging</strong>, <strong>software engineering tools</strong> are shared across disciplines (not only scientific computing)</li>
+<li><strong>Parallel</strong> processing</li>
+<li><strong>Caching</strong> functions</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="installation-of-the-required-materials">
+<h3>Installation of the required materials<a class="headerlink" href="#installation-of-the-required-materials" title="Permalink to this headline">¶</a></h3>
+<p>The Python scientific computing environment: <strong>Numpy</strong>, <strong>Scipy</strong>, also the <strong>scikit-learn</strong> (optional).
+Numpy provides data structures (array,
+matrices) and Scipy provides algorithms (linear algebra, signal processing, etc.). For parallel computing
+it uses <a class="reference external" href="http://http://packages.python.org/joblib/">joblib</a> shipped with the <a class="reference external" href="http://http://scikit-learn.sourceforge.net/">scikit-learn</a> .</p>
+<div class="section" id="get-the-code">
+<h4>Get the code<a class="headerlink" href="#get-the-code" title="Permalink to this headline">¶</a></h4>
+<blockquote>
+<div><a class="reference external" href="https://github.com/mne-tools/mne-python">https://github.com/mne-tools/mne-python</a></div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="from-raw-data-to-evoked-data">
+<h2>From raw data to evoked data<a class="headerlink" href="#from-raw-data-to-evoked-data" title="Permalink to this headline">¶</a></h2>
+<p>Now, launch <a class="reference external" href="http://ipython.scipy.org/">ipython</a> (Advanced Python shell):</p>
+<div class="highlight-python"><pre>$ ipython -pylab -wthread</pre>
+</div>
+<p>First, load the mne package:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">mne</span>
+</pre></div>
+</div>
+<div class="section" id="access-raw-data">
+<h3>Access raw data<a class="headerlink" href="#access-raw-data" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mne.datasets</span> <span class="kn">import</span> <span class="n">sample</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_path</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">data_path</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">raw_fname</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s">&#39;/MEG/sample/sample_audvis_filt-0-40_raw.fif&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">raw_fname</span>
+<span class="go">./MNE-sample-data/MEG/sample/sample_audvis_filt-0-40_raw.fif</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The MNE sample dataset should be downloaded automatically but be patient (&gt; 600MB)</p>
+</div>
+<p>Read data from file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">raw</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">fiff</span><span class="o">.</span><span class="n">Raw</span><span class="p">(</span><span class="n">raw_fname</span><span class="p">)</span> 
+<span class="go">Opening raw data ...</span>
+<span class="go">Ready.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">raw</span>
+<span class="go">Raw (n_channels x n_times : 376 x 41700)</span>
+</pre></div>
+</div>
+<p>Read and plot a segment of raw data</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">time_to_index</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">115</span><span class="p">)</span>  <span class="c"># 100 s to 115 s data segment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[:,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span>
+<span class="go">Reading 21465 ... 23716  =    142.953 ...   157.945 secs...  [done]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(376, 2252)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">times</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(2252,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">times</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span>  <span class="c"># take some Magnetometers</span>
+<span class="go">Reading 21465 ... 23716  =    142.953 ...   157.945 secs...  [done]</span>
+</pre></div>
+</div>
+<div class="figure">
+<img alt="Raw data" src="_images/plot_read_raw_data.png" />
+</div>
+<p>Save a segment of 150s of raw data (MEG only):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">picks</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">fiff</span><span class="o">.</span><span class="n">pick_types</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">meg</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">eeg</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">stim</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">raw</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;sample_audvis_meg_raw.fif&#39;</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">picks</span><span class="o">=</span><span class="n">picks</span><span class="p">)</span> 
+<span class="go">Reading ...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="define-and-read-epochs">
+<h3>Define and read epochs<a class="headerlink" href="#define-and-read-epochs" title="Permalink to this headline">¶</a></h3>
+<p>First extract events:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">find_events</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">stim_channel</span><span class="o">=</span><span class="s">&#39;STI 014&#39;</span><span class="p">)</span>
+<span class="go">Reading 6450 ... 48149  =     42.956 ...   320.665 secs...  [done]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">events</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="go">[[6994    0    2]</span>
+<span class="go"> [7086    0    3]</span>
+<span class="go"> [7192    0    1]</span>
+<span class="go"> [7304    0    4]</span>
+<span class="go"> [7413    0    2]]</span>
+</pre></div>
+</div>
+<p>Define epochs parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">event_id</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmin</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tmax</span> <span class="o">=</span> <span class="mf">0.5</span>
+</pre></div>
+</div>
+<p>Exclude some channels (bads + 2 more):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">exclude</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s">&#39;bads&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">&#39;MEG 2443&#39;</span><span class="p">,</span> <span class="s">&#39;EEG 053&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Pick the good channels:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">picks</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">fiff</span><span class="o">.</span><span class="n">pick_types</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="n">meg</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">eeg</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">eog</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stim</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Define the baseline period:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">baseline</span> <span class="o">=</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c"># means from the first instant to t = 0</span>
+</pre></div>
+</div>
+<p>Define peak-to-peak rejection parameters for gradiometers, magnetometers and EOG:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">reject</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">grad</span><span class="o">=</span><span class="mf">4000e-13</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="mf">4e-12</span><span class="p">,</span> <span class="n">eog</span><span class="o">=</span><span class="mf">150e-6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Read epochs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">epochs</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">Epochs</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">event_id</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">,</span> <span class="n">proj</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">picks</span><span class="o">=</span><span class="n">picks</span><span class="p">,</span> <span class="n">baseline</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span> <span class="n">preload</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">reject</span><span class="o">=</span><span class="n">reject</span><span class="p">)</span>
+<span class="go">4 projection items activated</span>
+<span class="go">Created an SSP operator (subspace dimension = 4)</span>
+<span class="go">72 matching events found</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">epochs</span>
+<span class="go">Epochs (n_events : 72, tmin : -0.2 (s), tmax : 0.5 (s), baseline : (None, 0))</span>
+</pre></div>
+</div>
+<p>Compute evoked responses by averaging and plot it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">evoked</span> <span class="o">=</span> <span class="n">epochs</span><span class="o">.</span><span class="n">average</span><span class="p">()</span> 
+<span class="go">Reading ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">evoked</span>
+<span class="go">Evoked (comment : Unknown, time : [-0.199795, 0.492828], n_epochs : 72, n_channels x n_times : 364 x 105)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mne.viz</span> <span class="kn">import</span> <span class="n">plot_evoked</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot_evoked</span><span class="p">(</span><span class="n">evoked</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure">
+<img alt="Evoked data" src="_images/plot_read_epochs.png" />
+</div>
+<div class="topic">
+<p class="topic-title first">Exercise</p>
+<ol class="arabic simple">
+<li>Extract the max value of each epoch</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">max_in_each_epoch</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">epochs</span><span class="p">]</span> 
+<span class="go">Reading ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">max_in_each_epoch</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+<span class="go">[1.9375166986930204e-05, 1.6405511048086112e-05, 1.8545375480692806e-05, 2.041281478349248e-05]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="time-frequency-induced-power-and-phase-locking-values">
+<h2>Time-Frequency: Induced power and phase-locking values<a class="headerlink" href="#time-frequency-induced-power-and-phase-locking-values" title="Permalink to this headline">¶</a></h2>
+<p>Define parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">n_cycles</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c"># number of cycles in Morlet wavelet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">frequencies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c"># frequencies of interest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Fs</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s">&#39;sfreq&#39;</span><span class="p">]</span>  <span class="c"># sampling in Hz</span>
+</pre></div>
+</div>
+<p>Compute induced power and phase-locking values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">epochs</span><span class="o">.</span><span class="n">get_data</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mne.time_frequency</span> <span class="kn">import</span> <span class="n">induced_power</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">power</span><span class="p">,</span> <span class="n">phase_lock</span> <span class="o">=</span> <span class="n">induced_power</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Fs</span><span class="o">=</span><span class="n">Fs</span><span class="p">,</span> <span class="n">frequencies</span><span class="o">=</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure">
+<img alt="Time-Frequency" src="_images/time_freq_demo.png" />
+</div>
+</div>
+<div class="section" id="inverse-modeling-mne-and-dspm-on-evoked-and-raw-data">
+<h2>Inverse modeling: MNE and dSPM on evoked and raw data<a class="headerlink" href="#inverse-modeling-mne-and-dspm-on-evoked-and-raw-data" title="Permalink to this headline">¶</a></h2>
+<p>Import the required functions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mne.minimum_norm</span> <span class="kn">import</span> <span class="n">apply_inverse</span><span class="p">,</span> <span class="n">read_inverse_operator</span>
+</pre></div>
+</div>
+<p>Read the inverse operator:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fname_inv</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s">&#39;/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inverse_operator</span> <span class="o">=</span> <span class="n">read_inverse_operator</span><span class="p">(</span><span class="n">fname_inv</span><span class="p">)</span> 
+<span class="go">Reading ...</span>
+</pre></div>
+</div>
+<p>Define the inverse parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">snr</span> <span class="o">=</span> <span class="mf">3.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lambda2</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">snr</span> <span class="o">**</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dSPM</span> <span class="o">=</span> <span class="bp">True</span>
+</pre></div>
+</div>
+<p>Compute the inverse solution:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stc</span> <span class="o">=</span> <span class="n">apply_inverse</span><span class="p">(</span><span class="n">evoked</span><span class="p">,</span> <span class="n">inverse_operator</span><span class="p">,</span> <span class="n">lambda2</span><span class="p">,</span> <span class="n">dSPM</span><span class="p">)</span> 
+<span class="go">Preparing the inverse operator for use ...</span>
+</pre></div>
+</div>
+<p>Save the source time courses to disk:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;mne_dSPM_inverse&#39;</span><span class="p">)</span>
+<span class="go">Writing STC to disk... [done]</span>
+</pre></div>
+</div>
+<p>Now, let&#8217;s compute dSPM on a raw file within a label:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">fname_label</span> <span class="o">=</span> <span class="n">data_path</span> <span class="o">+</span> <span class="s">&#39;/MEG/sample/labels/Aud-lh.label&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">label</span> <span class="o">=</span> <span class="n">mne</span><span class="o">.</span><span class="n">read_label</span><span class="p">(</span><span class="n">fname_label</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compute inverse solution during the first 15s:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mne.minimum_norm</span> <span class="kn">import</span> <span class="n">apply_inverse_raw</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">time_to_index</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>  <span class="c"># read the first 15s of data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stc</span> <span class="o">=</span> <span class="n">apply_inverse_raw</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">inverse_operator</span><span class="p">,</span> <span class="n">lambda2</span><span class="p">,</span> <span class="n">dSPM</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span> 
+<span class="go">Preparing the inverse operator for use ...</span>
+</pre></div>
+</div>
+<p>Save result in stc files:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">stc</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&#39;mne_dSPM_raw_inverse_Aud&#39;</span><span class="p">)</span>
+<span class="go">Writing STC to disk... [done]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-else-can-you-do">
+<h2>What else can you do?<a class="headerlink" href="#what-else-can-you-do" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>morph stc from one brain to another for group studies</li>
+<li>estimate power in the source space</li>
+<li>estimate noise covariance matrix from Raw and Epochs</li>
+<li>detect heart beat QRS component</li>
+<li>detect eye blinks and EOG artifacts</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="what-comes-next">
+<h2>What comes next?<a class="headerlink" href="#what-comes-next" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>sparse solvers</li>
+<li>beamformers (e.g. LCMV)</li>
+<li>coherence measures</li>
+<li>anything you want to contribute for the community !</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="some-screen-shots">
+<h2>Some screen shots<a class="headerlink" href="#some-screen-shots" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="2D toprography" src="_images/plot_topography.png" />
+<p class="caption">2D toprography</p>
+</div>
+<div class="figure">
+<img alt="Cluster level stat in time Frequency decomposition" src="_images/plot_cluster_1samp_test_time_frequency.png" />
+<p class="caption">Cluster level stat in time Frequency decomposition</p>
+</div>
+<div class="figure">
+<img alt="Topography of cluster level stat in time" src="_images/cluster_full_layout_c0-c1.png" />
+<p class="caption">Topography of cluster level stat in time</p>
+</div>
+<div class="figure">
+<img alt="Statistics on evoked data" src="_images/plot_cluster_stats_evoked.png" />
+<p class="caption">Statistics on evoked data</p>
+</div>
+</div>
+<div class="section" id="want-to-know-more-go-to-martinos-org-mne-and-browse-examples-gallery">
+<h2>Want to know more ? Go to <a class="reference external" href="http://www.martinos.org/mne">martinos.org/mne</a> and browse <a class="reference external" href="https://martinos.org/mne/auto_examples/index.html">examples</a> gallery<a class="headerlink" href="#want-to-know-more-go-to-martinos-org-mne-and-browse-examples-gallery" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+    </div>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2011, Alexandre Gramfort.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
