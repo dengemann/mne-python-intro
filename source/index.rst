@@ -13,11 +13,12 @@ Introduction
 MNE Python: The project vision
 ------------------------------
 
-    - A package to **make your life easier** when interacting **with MEG/EEG data**
-    - KISS principle : **Keep it super simple** !
-    - Robust software with good engineering: **tests**, **coverage** analysis, **code quality** control
+    - **Make your life easier** when interacting **with MEG/EEG data**
     - **Open** project: very permissive BSD license, open version control system to facilitate contributions
     - The project should be maintained by a **community of labs**
+
+    .. - KISS principle : **Keep it super simple** !
+    .. - Robust software with good engineering: **tests**, **coverage** analysis, **code quality** control
 
 What you're not supposed to do with MNE Python
 ----------------------------------------------
@@ -43,13 +44,13 @@ What you can do with MNE Python
 Why Python?
 -----------
 
-    - Full **control of the memory** you use for your analysis
-    - **Parallel** processing
-    - **Memoizing** functions
-    - **Packaging**, **software engineering tools** are shared across disciplines (not only scientific computing)
+    - Python is a real language that allows to design **clean and powerful APIs** (e.g. can be object oriented)
     - Runs on **all systems** (Linux, Mac and Windows)
     - **Free**
-    - Python is a real language that allows to design **clean and powerful APIs**
+    - Full **control of the memory** you use for your analysis
+    - **Packaging**, **software engineering tools** are shared across disciplines (not only scientific computing)
+    - **Parallel** processing
+    - **Caching** functions
 
 Installation of the required materials
 ---------------------------------------
@@ -254,8 +255,8 @@ Save result in stc files:
     >>> stc.save('mne_dSPM_raw_inverse_Aud')
     Writing STC to disk... [done]
 
-What else can I do?
-===================
+What else can you do?
+=====================
 
     - morph stc from one brain to another for group studies
     - estimate power in the source space
