@@ -2,7 +2,7 @@
 Intro to MEG and EEG processing with MNE and Python
 ===================================================
 
-**Authors:** A. Gramfort and M. Hämäläinen
+**Authors:** A. Gramfort, E. Larson, M. Luessi, D. Engemann, C. M. Brodbeck, M. Hämäläinen
 
 .. role:: input(strong)
 
@@ -13,31 +13,34 @@ Introduction
 MNE Python: The project vision
 ------------------------------
 
-    - **Make your life easier** when interacting **with MEG/EEG data**
+    - Make interacting **with MEG/EEG data** more **fun**.
     - **Open** project: very permissive BSD license, open version control system to facilitate contributions
-    - The project should be maintained by a **community of labs**
+    - The project is being maintained by a **community of labs**
 
     .. - KISS principle : **Keep it super simple** !
-    .. - Robust software with good engineering: **tests**, **coverage** analysis, **code quality** control
+    .. - Robust software with good engineering: **tests**, **coverage** analysis, **code quality** control, emphasis on **readability** and **simplicity**
 
 What you're not supposed to do with MNE Python
 ----------------------------------------------
 
-    - **Process raw files**: In short everything you do with *mne_process_raw* (filtering, computing SSP vectors, downsampling etc.)
     - **Forward modeling**: BEM computation and mesh creation (done with FreeSurfer)
-    - **Raw data visualization** done with *mne_browse_raw*
-    - **MNE source estimates visualization** done with *mne_analyze*
+    - **Interactive raw data visualization** done with *mne_browse_raw*
 
 What you can do with MNE Python
 ----------------------------------------------
 
-    - **Epoching**: Define epochs, baseline correction etc.
+    - **Process raw files**: In short everything you do with *mne_process_raw* (filtering, computing SSP vectors, downsampling etc.)
+    - **Independent Component Analysis**: on raw and epochs data.
+    - **Epoching**: Define epochs, baseline correction, drop bad epochs, handle epochs across conditions etc.
     - **Averaging** to get Evoked data
-    - **Linear inverse solvers** (dSPM, MNE)
-    - **Time-frequency** analysis with Morlet wavelets (induced power, phase lock value) also in the source space
     - **Compute contrasts** between conditions, between sensors, across subjects etc.
+    - **Linear inverse solvers** (dSPM, MNE, MxNE, beamformer)
+    - **Interactive MNE source estimates visualization**
+    - **Time-frequency** analysis with Morlet wavelets (induced power, phase lock value) also in the source space
+    - **Connectivity Estimation** visualize and analyse connectivity between sensors or between ROIs in source space.
     - **Non-parametric statistics** in time, space and frequency (including with cluster-level)
     - **Scripting** (batch and parallel computing)
+    - **Export data** embedded export to other Python libraries, i.e. NiTime and Panda, using methods provided for raw, epochs, and evoked objects
 
 .. note:: Packaged based on the FIF file format from Neuromag but can work with CTF and 4D after conversion to FIF.
 
@@ -60,9 +63,13 @@ Numpy provides data structures (array,
 matrices) and Scipy provides algorithms (linear algebra, signal processing, etc.). For parallel computing
 it uses `joblib`_ shipped with the `scikit-learn`_ .
 
-.. _joblib: http://http://packages.python.org/joblib/
-.. _scikit-learn: http://http://scikit-learn.sourceforge.net/
+.. _joblib: http://packages.python.org/joblib/
+.. _scikit-learn: http://scikit-learn.sourceforge.net/
 
+The embedded exporters require Pandas and NiTime:
+
+.. _pandas: http://pandas.pydata.org
+.. _nitime: http://nipy.sourceforge.net/nitime/
 
 Get the code
 ^^^^^^^^^^^^
@@ -115,6 +122,8 @@ Read and plot a segment of raw data
     >>> data, times = raw[2:20:3, start:stop]  # take some Magnetometers
     Reading 21465 ... 23716  =    142.953 ...   157.945 secs...  [done]
 
+    ## TODO plot command?
+
 .. figure:: images/plot_read_raw_data.png
     :alt: Raw data
 
@@ -138,9 +147,9 @@ First extract events:
      [7304    0    4]
      [7413    0    2]]
 
-Define epochs parameters:
+Define epochs parameters and handle conditions:
 
-    >>> event_id = 1
+    >>> event_id = dict(aud_l=1, vis_l=3)
     >>> tmin = -0.2
     >>> tmax = 0.5
 
@@ -167,16 +176,15 @@ Read epochs:
     Created an SSP operator (subspace dimension = 4)
     72 matching events found
     >>> print epochs
-    Epochs (n_events : 72, tmin : -0.2 (s), tmax : 0.5 (s), baseline : (None, 0))
+    Epochs (n_events : 145 (good & bad), tmin : -0.2 (s), tmax : 0.5 (s), baseline : (None, 0))
 
-Compute evoked responses by averaging and plot it:
+Compute evoked auditory responses by averaging and plot it:
 
-    >>> evoked = epochs.average() # doctest: +ELLIPSIS
+    >>> evoked = epochs['aud_l'].average() # doctest: +ELLIPSIS
     Reading ...
     >>> print evoked
     Evoked (comment : Unknown, time : [-0.199795, 0.492828], n_epochs : 72, n_channels x n_times : 364 x 105)
-    >>> from mne.viz import plot_evoked
-    >>> plot_evoked(evoked)
+    >>> evoked.plot()
 
 .. figure:: images/plot_read_epochs.png
     :alt: Evoked data
@@ -258,7 +266,13 @@ Save result in stc files:
 What else can you do?
 =====================
 
+    - plot and analyze connectivity in sensor and source space
+	- plot time frequency representations for all channels on sensor layout
+	- plot time epochs images for all channels on sensor layout to visualize cross-trial response dynamics
+    - decompose and automatically identify latent sources using ICA
+    - sensor space analyses in ICA space
     - morph stc from one brain to another for group studies
+	- interactively visualize source estimates
     - estimate power in the source space
     - estimate noise covariance matrix from Raw and Epochs
     - detect heart beat QRS component
@@ -267,9 +281,12 @@ What else can you do?
 What comes next?
 ================
 
-    - sparse solvers
-    - beamformers (e.g. LCMV)
-    - coherence measures
+    - frequency domain beamformers (e.g. DICS)
+	- improved M/EEG data simulation utilities
+	- band-stop and notch-filters for removal of power line artifacts 
+    - support for volumetric source space
+    - GLM framework for improved analysis of factorial experimental designs
+    - improved support for other MEG systems 
     - anything you want to contribute for the community !
 
 Some screen shots
@@ -280,21 +297,35 @@ Some screen shots
 
     2D toprography
 
-.. figure:: images/plot_cluster_1samp_test_time_frequency.png
-    :alt: Cluster level stat in time Frequency decomposition
+.. figure:: images/plot_topo_conditions_example.png
+	:alt: Compare conditions across channels
 
-    Cluster level stat in time Frequency decomposition
+	Compare conditions across channels
+
+.. figure:: images/plot_cluster_1samp_test_time_frequency.png
+    :alt: Cluster level stat in time frequency decomposition
+
+    Cluster level stat in time frequency decomposition
 
 .. figure:: images/cluster_full_layout_c0-c1.png
     :alt: Topography of cluster level stat in time
 
     Topography of cluster level stat in time
 
-.. figure:: images/plot_cluster_stats_evoked.png
-    :alt: Statistics on evoked data
+.. figure:: images/cwt_sensor_connectivity.png
+	:alt: Sensor space connectivity
 
-    Statistics on evoked data
+	Sensor space connectivity
 
+.. figure:: images/epochs_image.png
+    :alt: Cross-trial response dynamics
+
+    Cross-trial response dynamics
+
+.. figure:: images/plot_ica_panel.png
+	:alt: Independent Component Analysis
+	
+	Independent Component Analysis
 
 Want to know more ? Go to `martinos.org/mne`_ and browse `examples`_ gallery
 ============================================================================
