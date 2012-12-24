@@ -284,7 +284,6 @@ What comes next?
     - frequency domain beamformers (e.g. DICS)
     - improved M/EEG data simulation utilities
     - band-stop and notch-filters for removal of power line artifacts 
-    - support for volumetric source space
     - GLM framework for improved analysis of factorial experimental designs
     - improved support for other MEG systems 
     - anything you want to contribute for the community !
