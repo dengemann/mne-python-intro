@@ -267,12 +267,12 @@ What else can you do?
 =====================
 
     - plot and analyze connectivity in sensor and source space
-	- plot time frequency representations for all channels on sensor layout
-	- plot time epochs images for all channels on sensor layout to visualize cross-trial response dynamics
+    - plot time frequency representations for all channels on sensor layout
+    - plot time epochs images for all channels on sensor layout to visualize cross-trial response dynamics
     - decompose and automatically identify latent sources using ICA
     - sensor space analyses in ICA space
     - morph stc from one brain to another for group studies
-	- interactively visualize source estimates
+    - interactively visualize source estimates
     - estimate power in the source space
     - estimate noise covariance matrix from Raw and Epochs
     - detect heart beat QRS component
